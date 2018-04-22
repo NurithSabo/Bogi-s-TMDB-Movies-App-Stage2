@@ -16,7 +16,7 @@ import java.net.URL;
 class Utils{
     private final static String TMDB_BASE_URL = "http://api.themoviedb.org/3/movie/";
     private final static String API_QUERY = "api_key";
-    private  static final String API_KEY =  "84ffdd5222490bab19a1d49dfdc96a44";
+    private  static final String API_KEY =  "";
 
 
     /*Build an URL*/
