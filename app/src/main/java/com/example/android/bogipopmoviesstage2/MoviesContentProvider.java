@@ -1,0 +1,126 @@
+package com.example.android.bogipopmoviesstage2;
+
+import android.content.ContentProvider;
+import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.UriMatcher;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.support.annotation.NonNull;
+
+/**
+ * Created by Bogi on 2018. 04. 15..
+ */
+
+public class MoviesContentProvider extends ContentProvider {
+    private static final int MOVIE = 100;
+    private static final UriMatcher sUriMatcher = buildUriMatcher();
+    private TheMovieDbHelper mMovieDbHelper;
+
+    private static UriMatcher buildUriMatcher() {
+        UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+        uriMatcher.addURI(TheMovieContract.AUTHORITY, TheMovieContract.PATH_MOVIES, MOVIE);
+        return uriMatcher;
+    }
+
+    public MoviesContentProvider() { }
+
+    @Override
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
+
+        Uri res;
+        final SQLiteDatabase db = mMovieDbHelper.getWritableDatabase();
+
+        switch (sUriMatcher.match(uri)) {
+            case MOVIE: {
+                long id = db.insert(TheMovieContract.Favorites.TABLE_NAME, null, values);
+                if (id > 0) {
+                    res = ContentUris.withAppendedId(TheMovieContract.Favorites.CONTENT_URI, id);
+                } else {
+                    throw new android.database.SQLException("Error:: Failed to insert row into " + uri);
+                }
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Error:: Unknown uri: " + uri);
+        }
+        db.close();
+        getContext().getContentResolver().notifyChange(uri, null);
+        return res;
+    }
+
+    @Override
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
+        final SQLiteDatabase db = mMovieDbHelper.getWritableDatabase();
+        int movieDeleted;
+        switch (sUriMatcher.match(uri)) {
+            case MOVIE:
+                movieDeleted = db.delete(TheMovieContract.Favorites.TABLE_NAME, selection, selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Error:: Unknown uri: " + uri);
+        }
+        db.close();
+        if (movieDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return movieDeleted;
+    }
+
+    @Override
+    public String getType(@NonNull Uri uri) {
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case MOVIE:
+                return TheMovieContract.Favorites.CONTENT_TYPE;
+            default:
+                throw new UnsupportedOperationException("Error:: Unknown uri: " + uri);
+        }
+    }
+
+    @Override
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        Cursor cursor;
+        final SQLiteDatabase db = mMovieDbHelper.getReadableDatabase();
+        switch (sUriMatcher.match(uri)) {
+            case MOVIE: {
+                cursor = db.query(
+                        TheMovieContract.Favorites.TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Error: Unknown uri: " + uri);
+        }
+        db.close();
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return cursor;
+    }
+
+    @Override
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        final SQLiteDatabase db = mMovieDbHelper.getWritableDatabase();
+        int res;
+
+        switch (sUriMatcher.match(uri)) {
+            case MOVIE:
+                res = db.update(TheMovieContract.Favorites.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Error:: Unknown uri: " + uri);
+        }
+
+        db.close();
+        if (res != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return res;
+    }
+
+    @Override
+    public boolean onCreate() {
+        mMovieDbHelper = new TheMovieDbHelper(getContext());
+        return true;
+    }
+}

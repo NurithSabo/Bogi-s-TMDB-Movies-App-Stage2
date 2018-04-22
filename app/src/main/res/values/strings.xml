@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Bogi\'s TMDB Movies Stage2</string>
+
+    <string name ="title">Itt van a film címe</string>
+    <string name ="relase_date">Év</string>
+    <string name ="average_vote">Pontszáma</string>
+    <string name ="original_title">Eredeti cím</string>
+    <string name ="synopsis">történet</string>
+    <string name="average_rating">/ 10</string>
+
+    <!--menu_mainmenu strings:-->
+    <string name="menu_popular">popular</string>
+    <string name="menu_rating">top rated</string>
+    <string name="menu_favorite">favorites</string>
+    <string name="top_rated">top_rated</string>
+
+    <!--ContentDescriptions-->
+    <string name="detail_image_description">Movie poster</string>
+    <string name="main_image_description">Poster</string>
+
+    <string name="video">Video</string>
+    <string name="play">Play</string>
+
+    <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews</string>
+
+</resources>
